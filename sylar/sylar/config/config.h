@@ -6,6 +6,7 @@
 #include <string>
 #include "../util/util.h"
 #include "../log/log.h"
+#include "yaml-cpp/yaml.h"
 
 namespace sylar
 {
@@ -15,7 +16,11 @@ namespace sylar
         using ptr = std::shared_ptr<ConfigVarBase>;
 
         ConfigVarBase(const std::string &name, const std::string &descroption = "")
-            : m_name(name), m_description(descroption) {}
+            : m_name(name), m_description(descroption)
+        {
+            std::transform(m_name.begin(), m_name.end(), m_name.begin(), ::tolower);
+        }
+
         virtual ~ConfigVarBase() {}
 
         const std::string &getName() const { return m_name; }
@@ -93,7 +98,7 @@ namespace sylar
                 return tmp;
             }
 
-            if (name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._012345678") != std::string::npos)
+            if (name.find_first_not_of("abcdefghijklmnopqrstuvwxyz._012345678") != std::string::npos)
             {
                 LOG_ERROR(LOG_ROOT) << "Lookup name invaild " << name << " \n";
                 throw std::invalid_argument(name);
@@ -117,11 +122,14 @@ namespace sylar
             return std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
         }
 
+        static void LoadFromYaml(const YAML::Node &root);
+
+        static ConfigVarBase::ptr LookupBase(const std::string &name);
+
     private:
         static ConfigVarMap m_datas;
     };
 
-    Config::ConfigVarMap Config::m_datas;
 }
 
 #endif // __CONFIG_H__
