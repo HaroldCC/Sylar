@@ -68,7 +68,16 @@ void test_config()
 
     LOG_INFO(LOG_ROOT) << "after: " << gIntValueConfig->getValue();
     LOG_INFO(LOG_ROOT) << "after: " << gFloatValueConfig->toString();
+
+    v = gIntVecValueConfig->getValue();
+    for (auto &i : v)
+    {
+        LOG_INFO(LOG_ROOT) << "after: "
+                           << "int_vec: " << i;
+    }
 }
+
+int main(int argc, char const *argv[])
 {
 
     //test_yaml();
