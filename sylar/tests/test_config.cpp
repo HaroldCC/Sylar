@@ -8,12 +8,9 @@ sylar::ConfigVar<int>::ptr gIntValueConfig =
 sylar::ConfigVar<float>::ptr gFloatValueConfig =
     sylar::Config::Lookup("system.value", static_cast<float>(10.2f), "system value");
 
-<<<<<<< HEAD
 sylar::ConfigVar<std::vector<int>>::ptr gIntVecValueConfig =
     sylar::Config::Lookup("system.int_vec", std::vector<int>{1, 2, 3, 4, 5}, "system int vec");
 
-=======
->>>>>>> 059788bf52edef47beab23c3ec562829506863bd
 void print_yaml(const YAML::Node &node, int level)
 {
     if (node.IsNull())
