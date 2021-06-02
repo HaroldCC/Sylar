@@ -1,0 +1,3 @@
+2021-05-31 10:38:31	23293	A	0	[DEBUG]	[log0]	main.cpp:14	test debug
+2021-05-31 10:38:31	23293	A	0	[INFO]	[log0]	main.cpp:15	test info
+2021-05-31 10:38:31	23293	threadName	0	[INFO]	[log0]	main.cpp:17	test log info 10	astr

@@ -6,6 +6,7 @@
 #include <string>
 #include "../util/util.h"
 #include "../log/log.h"
+#include "yaml-cpp/yaml.h"
 
 namespace sylar
 {
@@ -15,7 +16,11 @@ namespace sylar
         using ptr = std::shared_ptr<ConfigVarBase>;
 
         ConfigVarBase(const std::string &name, const std::string &descroption = "")
-            : m_name(name), m_description(descroption) {}
+            : m_name(name), m_description(descroption)
+        {
+            std::transform(m_name.begin(), m_name.end(), m_name.begin(), ::tolower);
+        }
+
         virtual ~ConfigVarBase() {}
 
         const std::string &getName() const { return m_name; }
@@ -29,7 +34,56 @@ namespace sylar
         std::string m_description;
     };
 
+    template <typename FromType, typename ToType>
+    class LexicalCast
+    {
+    public:
+        ToType operator()(const FromType &val)
+        {
+            return Util::lexical_cast<ToType>(val);
+        }
+    };
+
     template <typename T>
+    class LexicalCast<std::string, std::vector<T>>
+    {
+    public:
+        std::vector<T> operator()(const std::string &val)
+        {
+            YAML::Node node = YAML::Load(val);
+            std::stringstream ss;
+            std::vector<T> vec;
+            for (size_t i = 0; i < node.size(); ++i)
+            {
+                ss.str("");
+                ss << node[i];
+                vec.push_back(LexicalCast<std::string, T>()(ss.str()));
+            }
+            return vec;
+        }
+    };
+
+    template <typename T>
+    class LexicalCast<std::vector<T>, std::string>
+    {
+    public:
+        std::string operator()(const std::vector<T> &val)
+        {
+            YAML::Node node;
+            for (auto &i : val)
+            {
+                node.push_back(YAML::Load(LexicalCast<T, std::string>()(i)));
+            }
+            std::stringstream ss;
+            ss << node;
+            return ss.str();
+        }
+    };
+
+    // FromStr: T operator()(cosnt std::string&)
+    // ToStr: std::string operator()(const T&)
+    template <typename T, typename FormStr = LexicalCast<std::string, T>,
+              typename ToStr = LexicalCast<T, std::string>>
     class ConfigVar : public ConfigVarBase
     {
     public:
@@ -42,7 +96,8 @@ namespace sylar
         {
             try
             {
-                return Util::lexical_cast<std::string>(m_val);
+                //return Util::lexical_cast<std::string>(m_val);
+                return ToStr()(m_val);
             }
             catch (const std::exception &e)
             {
@@ -54,14 +109,12 @@ namespace sylar
             return "";
         }
 
-        const T getValue() const { return m_val; }
-        void setValue(const T &val) { m_val = val; }
-
         bool fromString(const std::string &str) override
         {
             try
             {
-                return (m_val = Util::lexical_cast<T>(str));
+                //return (m_val = Util::lexical_cast<T>(str));
+                setValue(FormStr()(str));
             }
             catch (const std::exception &e)
             {
@@ -71,6 +124,9 @@ namespace sylar
             }
             return false;
         }
+
+        const T getValue() const { return m_val; }
+        void setValue(const T &val) { m_val = val; }
 
     private:
         T m_val;
@@ -93,7 +149,7 @@ namespace sylar
                 return tmp;
             }
 
-            if (name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._012345678") != std::string::npos)
+            if (name.find_first_not_of("abcdefghijklmnopqrstuvwxyz._012345678") != std::string::npos)
             {
                 LOG_ERROR(LOG_ROOT) << "Lookup name invaild " << name << " \n";
                 throw std::invalid_argument(name);
@@ -117,11 +173,14 @@ namespace sylar
             return std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
         }
 
+        static void LoadFromYaml(const YAML::Node &root);
+
+        static ConfigVarBase::ptr LookupBase(const std::string &name);
+
     private:
         static ConfigVarMap m_datas;
     };
 
-    Config::ConfigVarMap Config::m_datas;
 }
 
 #endif // __CONFIG_H__
