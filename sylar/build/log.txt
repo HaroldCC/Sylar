@@ -1,3 +1,0 @@
-2021-06-02 14:01:45	3999	A	0	[DEBUG]	[log0]	/home/harold/cppProj/Sylar/sylar/tests/test_log.cpp:14	test debug
-2021-06-02 14:01:45	3999	A	0	[INFO]	[log0]	/home/harold/cppProj/Sylar/sylar/tests/test_log.cpp:15	test info
-2021-06-02 14:01:45	3999	threadName	0	[INFO]	[log0]	/home/harold/cppProj/Sylar/sylar/tests/test_log.cpp:17	test log info 10	astr
