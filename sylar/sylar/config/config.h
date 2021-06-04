@@ -79,7 +79,6 @@ namespace sylar
             return ss.str();
         }
     };
-    //
 
     // FromStr: T operator()(cosnt std::string&)
     // ToStr: std::string operator()(const T&)
