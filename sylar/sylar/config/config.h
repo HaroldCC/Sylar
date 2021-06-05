@@ -12,6 +12,7 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <functional>
 
 namespace sylar
 {
@@ -288,6 +289,7 @@ namespace sylar
     {
     public:
         using ptr = std::shared_ptr<ConfigVar>;
+        using on_change_callback = std::function<void(const T &oldValue, const T &newValue)>;
 
         ConfigVar(const std::string &name, const T &defaultValue, const std::string &descripton = "")
             : ConfigVarBase(name, descripton), m_val(defaultValue) {}
@@ -326,11 +328,46 @@ namespace sylar
         }
 
         const T getValue() const { return m_val; }
-        void setValue(const T &val) { m_val = val; }
+
+        void setValue(const T &val)
+        {
+            if (val == m_val)
+            {
+                return;
+            }
+
+            for (auto &i : m_callbacks)
+            {
+                i.second(m_val, val);
+            }
+            m_val = val;
+        }
+
         std::string getTypeName() const override { return typeid(T).name(); }
+
+        void addListener(uint64_t key, on_change_callback callback)
+        {
+            m_callbacks[key] = callback;
+        }
+
+        void delListener(uint64_t key)
+        {
+            m_callbacks.erase(key);
+        }
+
+        on_change_callback getListener(uint64_t key)
+        {
+            auto it = m_callbacks.find(key);
+            return it == m_callbacks.end() ? nullptr : it->second;
+        }
+
+        void clearListener() { m_callbacks.clear(); }
 
     private:
         T m_val;
+
+        //变更回调函数组，回调函数可以用一个唯一的hash值对其进行关联(目前使用的是一个uint64_t值)
+        std::map<uint64_t, on_change_callback> m_callbacks;
     };
 
     class Config

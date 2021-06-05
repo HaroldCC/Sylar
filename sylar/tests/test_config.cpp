@@ -141,6 +141,13 @@ public:
            << "]";
         return ss.str();
     }
+
+    bool operator==(const Person &rhs) const
+    {
+        return m_name == rhs.m_name &&
+               m_age == rhs.m_age &&
+               m_sex == rhs.m_sex;
+    }
 };
 
 // 对自定义类型进行LexicalCast偏特化
@@ -202,6 +209,10 @@ void test_class()
         }                                                                                    \
         LOG_INFO(LOG_ROOT) << prefix << ": size = " << m.size();                             \
     }
+
+    g_person->addListener(10, [](const Person &oldValue, const Person &newValue)
+                          { LOG_INFO(LOG_ROOT) << "old_value: " << oldValue.toString()
+                                               << " new_value: " << newValue.toString(); });
 
     XX_PM(g_person_map, "class.map before");
     LOG_INFO(LOG_ROOT) << "before: " << g_person_vec_map->toString();
