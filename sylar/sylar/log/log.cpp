@@ -542,7 +542,7 @@ namespace sylar
 		setFormatter(newFormatter);
 	}
 
-	LogFormatter::ptr Logger::getFormatter()
+	LogFormatter::ptr Logger::getFormatter() const
 	{
 		std::lock_guard<std::mutex> lockGuard(m_mutex);
 		return m_formatter;
@@ -597,7 +597,7 @@ namespace sylar
 		}
 	}
 
-	LogFormatter::ptr LogAppender::getFormatter()
+	LogFormatter::ptr LogAppender::getFormatter() const
 	{
 		std::lock_guard<std::mutex> lockGuard(m_mutex);
 		return m_formatter;
@@ -622,7 +622,7 @@ namespace sylar
 		m_root->addAppender(LogAppender::ptr(new StdoutLogAppender));
 	}
 
-	Logger::ptr LoggerManager::getLogger(const std::string &name)
+	Logger::ptr LoggerManager::getLogger(const std::string &name) const
 	{
 		auto it = m_loggers.find(name);
 		return it == m_loggers.end() ? m_root : it->second;

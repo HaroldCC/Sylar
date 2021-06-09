@@ -210,14 +210,14 @@ namespace sylar
         virtual void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
 
         void setFormatter(LogFormatter::ptr formatter);
-        LogFormatter::ptr getFormatter();
+        LogFormatter::ptr getFormatter() const;
         void setLevel(LogLevel::Level level) { m_level = level; }
         LogLevel::Level getLevel() const { return m_level; }
 
     protected:
         LogLevel::Level m_level = LogLevel::DEBUG;
         bool m_has_formatter = false;
-        std::mutex m_mutex;
+        mutable std::mutex m_mutex;
         LogFormatter::ptr m_formatter;
     };
 
@@ -244,7 +244,7 @@ namespace sylar
         const std::string &getName() const { return m_name; }
         void setFormatter(LogFormatter::ptr formatter);
         void setFormatter(const std::string &formatter);
-        LogFormatter::ptr getFormatter();
+        LogFormatter::ptr getFormatter() const;
 
     private:
         std::string m_name;                                  // 日志名称
@@ -252,7 +252,7 @@ namespace sylar
         std::list<std::shared_ptr<LogAppender>> m_appenders; // Appender集合
         std::shared_ptr<LogFormatter> m_formatter;           // 日志格式器
         Logger::ptr m_root;                                  // 主日志器
-        std::mutex m_mutex;
+        mutable std::mutex m_mutex;
     };
 
     // 输出到控制台的Appender
@@ -286,12 +286,12 @@ namespace sylar
     public:
         LoggerManager();
 
-        Logger::ptr getLogger(const std::string &name);
+        Logger::ptr getLogger(const std::string &name) const;
         void init();
         Logger::ptr getRoot() const { return m_root; }
 
     private:
-        std::mutex m_mutex;
+        mutable std::mutex m_mutex;
         std::map<std::string, Logger::ptr> m_loggers; // 日志容器
         Logger::ptr m_root;                           // 主日志器
     };

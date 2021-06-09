@@ -65,7 +65,7 @@ void print_yaml(const YAML::Node &node, int level)
 
 void test_yaml()
 {
-    YAML::Node root = YAML::LoadFile("../bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile("../bin/conf/testConfig.yml");
     print_yaml(root, 0);
 
     LOG_INFO(LOG_ROOT) << root.Scalar();
@@ -108,7 +108,7 @@ void test_config()
     XX_M(gStrIntMapValueConfig, str_int_map, before);
     XX_M(gStrIntUMapValueConfig, str_int_umap, before);
 
-    YAML::Node root = YAML::LoadFile("../bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile("../bin/conf/testConfig.yml");
     sylar::Config::LoadFromYaml(root);
 
     LOG_INFO(LOG_ROOT) << "after: " << gIntValueConfig->getValue();
@@ -217,7 +217,7 @@ void test_class()
     XX_PM(g_person_map, "class.map before");
     LOG_INFO(LOG_ROOT) << "before: " << g_person_vec_map->toString();
 
-    YAML::Node root = YAML::LoadFile("../bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile("../bin/conf/testConfig.yml");
     sylar::Config::LoadFromYaml(root);
 
     LOG_INFO(LOG_ROOT) << "after: " << g_person->getValue().toString() << " - " << g_person->toString();
