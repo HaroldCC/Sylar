@@ -11,7 +11,7 @@
 #endif
 
 /*
- *@brief 获取线程ID
+ * @brief 获取线程ID
  * @return 整形值线程id
  */
 inline std::uint32_t getThreadId()
@@ -123,6 +123,7 @@ namespace Util
 
         return result;
     }
+
 }
 
 #endif // __UTIL_H__

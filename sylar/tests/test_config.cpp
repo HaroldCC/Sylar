@@ -225,11 +225,30 @@ void test_class()
     LOG_INFO(LOG_ROOT) << "after: " << g_person_vec_map->toString();
 }
 
+void test_log_yaml_config()
+{
+    static sylar::Logger::ptr system_log = LOG_NAME("system");
+    LOG_INFO(system_log) << "hello system" << std::endl;
+    std::cout << sylar::LoggerMgr::GetInstance()->toYamlString() << std::endl;
+    YAML::Node root = YAML::LoadFile("../bin/conf/log.yaml");
+    sylar::Config::LoadFromYaml(root);
+    std::cout << "======================================" << std::endl;
+    std::cout << sylar::LoggerMgr::GetInstance()->toYamlString() << std::endl;
+    std::cout << "======================================" << std::endl;
+    std::cout << root << std::endl;
+    LOG_INFO(system_log) << "hello system" << std::endl;
+
+    system_log->setFormatter("%d - %m%n");
+    LOG_INFO(system_log) << "hello system" << std::endl;
+}
+
 int main(int argc, char const *argv[])
 {
 
     //test_yaml();
     //test_config();
-    test_class();
+    //test_class();
+    test_log_yaml_config();
+
     return 0;
 }

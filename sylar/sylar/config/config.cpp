@@ -2,7 +2,6 @@
 
 namespace sylar
 {
-    Config::ConfigVarMap Config::m_datas;
 
     static void ListAllMember(const std::string &prefix, const YAML::Node &node,
                               std::list<std::pair<std::string, const YAML::Node>> &output)
@@ -58,7 +57,7 @@ namespace sylar
 
     ConfigVarBase::ptr Config::LookupBase(const std::string &name)
     {
-        auto it = m_datas.find(name);
-        return it == m_datas.end() ? nullptr : it->second;
+        auto it = getDatas().find(name);
+        return it == getDatas().end() ? nullptr : it->second;
     }
 }

@@ -326,7 +326,6 @@ namespace sylar
             }
             return false;
         }
-
         const T getValue() const { return m_val; }
 
         void setValue(const T &val)
@@ -375,13 +374,23 @@ namespace sylar
     public:
         using ConfigVarMap = std::unordered_map<std::string, ConfigVarBase::ptr>;
 
+        /**
+         * @brief 获取/创建对应参数名的配置参数
+         * @param[in] name 配置参数名称
+         * @param[in] defaultValue 参数默认值
+         * @param[in] description 参数描述
+         * @details 获取参数名为name的配置参数,如果存在直接返回
+         *          如果不存在,创建参数配置并用default_value赋值
+         * @return 返回对应的配置参数,如果参数名存在但是类型不匹配则返回nullptr
+         * @exception 如果参数名包含非法字符[^0-9a-z_.] 抛出异常 std::invalid_argument
+         */
         template <typename T>
         static typename ConfigVar<T>::ptr Lookup(const std::string &name,
                                                  const T &defaultValue,
                                                  const std::string &description = "")
         {
-            auto it = m_datas.find(name);
-            if (it != m_datas.end())
+            auto it = getDatas().find(name);
+            if (it != getDatas().end())
             {
                 auto tmp = std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
                 if (tmp)
@@ -405,7 +414,7 @@ namespace sylar
             }
 
             typename ConfigVar<T>::ptr v(new ConfigVar<T>(name, defaultValue, description));
-            m_datas[name] = v;
+            getDatas()[name] = v;
 
             return v;
         }
@@ -413,8 +422,8 @@ namespace sylar
         template <typename T>
         static typename ConfigVar<T>::ptr Lookup(const std::string &name)
         {
-            auto it = m_datas.find(name);
-            if (it == m_datas.end())
+            auto it = getDatas().find(name);
+            if (it == getDatas().end())
             {
                 return nullptr;
             }
@@ -427,7 +436,14 @@ namespace sylar
         static ConfigVarBase::ptr LookupBase(const std::string &name);
 
     private:
-        static ConfigVarMap m_datas;
+        /*  static ConfigVarMap m_datas; 
+            最初实现是成员函数直接操纵的m_datas中的数据(non-local static)--->存在初始化次序的问题；
+            所以更改为local static(使用静态成员函数返回静态成员的引用) */
+        static ConfigVarMap &getDatas()
+        {
+            static ConfigVarMap m_datas;
+            return m_datas;
+        }
     };
 
 }
